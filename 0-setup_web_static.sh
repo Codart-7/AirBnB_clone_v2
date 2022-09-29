@@ -1,29 +1,21 @@
 #!/usr/bin/env bash
 # sets up your web servers for the deployment of web_static
-
-# install nginx web server 
 sudo apt-get update
-sudo apt-get install -y nginx
-
-sudo mkdir -p /data/
+sudo apt-get -y install nginx
+sudo ufw app list
+sudo ufw allow 'Nginx HTTP'
 sudo mkdir -p /data/web_static/
-sudo mkdir -p /data/web_static/releases/
-sudo mkdir -p /data/web_static/shared/
 sudo mkdir -p /data/web_static/releases/test/
-
-sudo chown -R ubuntu:ubuntu /data/
-
-echo -e "<html>\n  <head>\n  </head>\n  <body>\n    Holberton School\n  </body>\n</html>" > /data/web_static/releases/test/index.html
-
-
-# Create symlink, override if already exists
-ln -sfn /data/web_static/releases/test /data/web_static/current
-
-if grep -q hbnb_static /etc/nginx/sites-available/default
-then
-    echo ""
-else
-    sudo sed -i '/:80 default_server/a \\tlocation /hbnb_static/ {\n\t\talias /data/web_static/current/;\n\t}' /etc/nginx/sites-available/default
-fi
-
+sudo mkdir -p /data/web_static/shared/
+echo "<html>
+  <head>
+  </head>
+  <body>
+    Holberton School
+  </body>
+</html>" > /data/web_static/releases/test/index.html
+sudo ln -sf /data/web_static/releases/test /data/web_static/current
+sudo chown -R ubuntu:ubuntu /data
+sudo sed -i '/listen 80 default_server/a location /hbnb_static/ { alias /data/web_static/current/;}' /etc/nginx/sites-available/default
 sudo service nginx restart
+exit 0
